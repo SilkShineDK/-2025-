@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Анализ анкетирования сотрудников</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        header {
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px 40px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            color: #3498db;
+            font-weight: bold;
+            border-bottom: 3px solid transparent;
+            flex: 1 1 auto;
+            text-align: center;
+        }
+        .tab.active {
+            border-bottom: 3px solid #3498db;
+            color: #2c3e50;
+        }
+        .content-section {
+            display: none;
+            margin-top: 20px;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .card {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        .metric-card {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        .metric-title {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        .bar-container {
+            background-color: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+            height: 20px;
+        }
+        .bar {
+            height: 100%;
+            transition: width 0.5s ease-in-out;
+        }
+        .bar.red { background-color: #e74c3c; }
+        .bar.orange { background-color: #f39c12; }
+        .bar.green { background-color: #2ecc71; }
+        .strengths-improvements {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .list-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .list-item svg {
+            margin-right: 10px;
+        }
+        .category {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2980b9;
+        }
+        .problem {
+            margin-bottom: 15px;
+            padding-left: 25px;
+            position: relative;
+        }
+        .problem::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #e74c3c;
+        }
+        .recommendation {
+            margin-bottom: 15px;
+            padding-left: 25px;
+            position: relative;
+        }
+        .recommendation::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #27ae60;
+        }
+        .raw-responses {
+            white-space: pre-wrap;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+        }
+        @media (max-width: 768px) {
+            .strengths-improvements {
+                grid-template-columns: 1fr;
+            }
+            .tabs {
+                flex-direction: column;
+            }
+            .tab {
+                border-bottom: none;
+                border-right: 2px solid #e0e0e0;
+            }
+            .tab:last-child {
+                border-right: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Анализ анкетирования сотрудников</h1>
+            <p>Комплексный анализ результатов опроса сотрудников</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('overview')">Общий анализ</div>
+            <div class="tab" onclick="showTab('recommendations')">Рекомендации</div>
+            <div class="tab" onclick="showTab('text-analysis')">Текстовые ответы</div>
+            <div class="tab" onclick="showTab('raw')">Оригинальные ответы</div>
+        </div>
+
+        <!-- Общий анализ -->
+        <div id="overview" class="content-section active">
+            <div class="metric-card">
+                <h2 class="metric-title">Ключевые метрики</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span>Средний балл по всем вопросам</span>
+                            <span class="font-bold">3.47</span>
+                        </div>
+                        <div class="bar-container">
+                            <div class="bar green" style="width: 69%;"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span>Наивысшая оценка</span>
+                            <span class="font-bold">3.86</span>
+                        </div>
+                        <div class="bar-container">
+                            <div class="bar green" style="width: 77%;"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span>Наинизшая оценка</span>
+                            <span class="font-bold">3.00</span>
+                        </div>
+                        <div class="bar-container">
+                            <div class="bar orange" style="width: 60%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="strengths-improvements">
+                <div class="metric-card">
+                    <h2 class="metric-title">Сильные стороны</h2>
+                    <div class="list-item">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2ecc71" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span>Высокий уровень удовлетворенности работой в целом (3.86)</span>
+                    </div>
+                    <div class="list-item">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2ecc71" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span>Хорошая готовность рекомендовать компанию (3.79)</span>
+                    </div>
+                    <div class="list-item">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2ecc71" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span>Хорошее понимание целей компании (3.79)</span>
+                    </div>
+                    <div class="list-item">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2ecc71" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span>Положительная оценка взаимодействия с коллегами (3.71)</span>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <h2 class="metric-title">Зоны для улучшения</h2>
+                    <div class="list-item">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e74c3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        <span>Профессиональный рост (3.07) - ниже среднего по сравнению с другими показателями</span>
+                    </div>
+                    <div class="list-item">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e74c3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        <span>Обратная связь (3.00) - самый низкий показатель</span>
+                    </div>
+                    <div class="list-item">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e74c3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        <span>Оценка вклада (3.21) - требует внимания</span>
+                    </div>
+                    <div class="list-item">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e74c3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        <span>Реакция руководителя (3.29) - умеренный уровень</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Рекомендации -->
+        <div id="recommendations" class="content-section">
+            <div class="card">
+                <h2>Рекомендации по улучшению</h2>
+                
+                <div class="list-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3498db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <span>Разработать программу профессионального развития сотрудников</span>
+                </div>
+                <div class="list-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3498db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <span>Ввести регулярные встречи один-на-один между руководителями и подчиненными</span>
+                </div>
+                <div class="list-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3498db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <span>Создать систему признания и вознаграждения за профессиональные достижения</span>
+                </div>
+                <div class="list-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3498db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <span>Провести тренинги по эффективному руководству для менеджеров</span>
+                </div>
+                <div class="list-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3498db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <span>Создать четкие карьерные пути для сотрудников</span>
+                </div>
+                <div class="list-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3498db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <span>Внедрить систему обратной связи 360°</span>
+                </div>
+                <div class="list-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3498db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <span>Ввести систему премий и материального поощрения</span>
+                </div>
+                <div class="list-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3498db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <span>Повышать зарплаты ежегодно с учетом инфляции</span>
+                </div>
+                <div class="list-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3498db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <span>Организовывать регулярные командные мероприятия</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Анализ текстовых ответов -->
+        <div id="text-analysis" class="content-section">
+            <div class="card">
+                <h2>Основные проблемы</h2>
+                
+                <div class="category">Технические проблемы</div>
+                <div class="problem">Проблемы с программным обеспечением, особенно с Битрикс 24</div>
+                <div class="problem">Сложные и неэффективные процессы (например, оформление скидок)</div>
+                <div class="problem">Недоработки программного обеспечения, мешающие эффективной работе</div>
+                
+                <div class="category">Организационные проблемы</div>
+                <div class="problem">Непонимание ролей и обязанностей между сотрудниками</div>
+                <div class="problem">Отсутствие четкого разделения ответственности</div>
+                <div class="problem">Нарушение рабочего графика руководителем</div>
+                <div class="problem">Суетливость со стороны руководителя, ухудшающая рабочий процесс</div>
+                <div class="problem">Сравнение филиалов (Брест и Гродно), не учитывающее специфику регионов</div>
+                
+                <div class="category">Коммуникационные проблемы</div>
+                <div class="problem">Сложности с получением информации от руководителя</div>
+                <div class="problem">Недостаточно конструктивное общение между руководителем и сотрудниками</div>
+                <div class="problem">Неэффективная обратная связь</div>
+                
+                <div class="category">Мотивационные проблемы</div>
+                <div class="problem">Отсутствие поощрений за хорошую работу</div>
+                <div class="problem">Низкая зарплата</div>
+                <div class="problem">Нет системы премий</div>
+            </div>
+
+            <div class="card">
+                <h2>Предложения по улучшению</h2>
+                
+                <div class="category">Технические улучшения</div>
+                <div class="recommendation">Наладить корректную работу программного обеспечения (особенно Битрикс)</div>
+                <div class="recommendation">Упростить и оптимизировать рабочие процессы</div>
+                
+                <div class="category">Организационные изменения</div>
+                <div class="recommendation">Четко определить и довести до всех сотрудников их обязанности</div>
+                <div class="recommendation">Соблюдать рабочий график всем сотрудникам, включая руководство</div>
+                <div class="recommendation">Рассмотреть возможность индивидуального подхода к разным филиалам</div>
+                <div class="recommendation">Обновлять складские позиции для более комфортной работы с клиентами</div>
+                
+                <div class="category">Коммуникационные улучшения</div>
+                <div class="recommendation">Выстраивать более уважительный и конструктивный формат общения между руководителем и сотрудниками</div>
+                <div class="recommendation">Проводить совместные мероприятия для улучшения командного духа</div>
+                <div class="recommendation">Организовать пятиминутки на чай-кофе с обсуждением нерабочих тем</div>
+                <div class="recommendation">Повышать мотивацию через признание хорошей работы</div>
+                
+                <div class="category">Мотивационные меры</div>
+                <div class="recommendation">Ввести систему поощрений за хорошую работу</div>
+                <div class="recommendation">Повышать заработную плату ежегодно с учетом инфляции</div>
+                <div class="recommendation">Предоставлять страховку и выплаты на оздоровление сотрудникам</div>
+                <div class="recommendation">Ввести 13-ю зарплату</div>
+                <div class="recommendation">Предоставлять премии за эффективную работу</div>
+            </div>
+        </div>
+
+        <!-- Оригинальные ответы -->
+        <div id="raw" class="content-section">
+            <div class="card">
+                <h2>Оригинальные текстовые ответы</h2>
+                <div class="raw-responses">
+                    1. "С какими проблемами вы сталкиваетесь в работе?":
+                    "У сотрудников нет понимания кто за что отвечает и кто что делает (по этому некоторые сотрудники пытаются перекинуть свою работу на коллегу). постоянные проблемы в работе программы (битрикс 24) которые мешают выполнять работу в оптимальные сроки, либо приходится всё переделывать, что снижает продуктивность и подрывает эмоциональное состояние. не возможно в моменте получить нужную информацию от руководителя."
+                    
+                    2. "Есть ли у вас предложения по улучшению коммуникации в команде или с руководством?":
+                    "1. присутствие руководителя на рабочем месте в часы работы предприятия и соблюдать трудовой распорядок им же установленный. 2. довести до всех сотрудников кто за что отвечает и их чёткие обязанности. 3. ни каких звонков и переписок вне рабочее время. 4. руководителю уважать каждого сотрудника и не думать что похвала за хорошую работу это проявление слабости. 5. проводить пятиминутки на чай-кофе с обсуждением тем не связанных с рабочими моментами при участии всего коллектива и руководителя. 6. держать открытой информацию о расходах и доходах предприятия."
+                    
+                    3. "Что бы вы хотели изменить в компании?":
+                    "отношение руководителя к каждому сотруднику. разработать систему поощрений за хорошую работу (с экономил, больше продал, помог сотруднику и т.д). повышение заработной платы ежегодно в процентном соотношении с повышением цен на продукты и прочее. 100% официальная зарплата. страховка сотрудников. выплаты на оздоровление."
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabId) {
+            // Скрыть все секции
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Удалить активный класс у всех табов
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Показать нужную секцию
+            document.getElementById(tabId).classList.add('active');
+            
+            // Добавить активный класс текущему табу
+            event.currentTarget.classList.add('active');
+        }
+    </script>
+</body>
+</html>
